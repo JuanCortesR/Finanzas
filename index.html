@@ -15,7 +15,7 @@ h1{font-size:26px;color:var(--ac);margin:6px 0 12px}h2{font-size:17px;margin:18p
 .kp{display:grid;grid-template-columns:1fr 1fr;gap:10px}.kp div{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:12px}
 .kp small,.mut{color:var(--mut);font-size:13px}.kp b{display:block;font-size:20px;margin-top:2px}
 .pos{color:var(--ok)}.neg{color:var(--bad)}
-table{width:100%;border-collapse:collapse;font-size:14px}th{color:var(--mut);font-weight:600;text-align:right;padding:6px 4px}td{text-align:right;padding:8px 4px;border-top:1px solid var(--ln)}th:first-child,td:first-child{text-align:left}
+table{width:100%;border-collapse:collapse;font-size:14px}th{color:var(--mut);font-weight:600;text-align:right;padding:6px 3px}td{text-align:right;padding:8px 3px;border-top:1px solid var(--ln)}th:first-child,td:first-child{text-align:left}
 .sc{overflow-x:auto}
 input,select,button{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--ln);border-radius:10px;padding:10px;width:100%}
 button{background:var(--ac);color:#fff;border:0;font-weight:600;margin-top:8px}button.s{background:var(--bg);color:var(--tx);border:1px solid var(--ln)}button.d{background:none;color:var(--bad);border:0;width:auto;margin:0}
@@ -51,6 +51,7 @@ if(!S.inv.length&&tab!='aju')tab='aju';
 ({res,gra,reg,aju})[tab]();window.scrollTo(0,0)}
 
 let rfil={from:null,to:null};
+function vr(L,R,ids,j){if(j<1)return['–','mut'];const p=sum(R,ids,j-1,'fin'),c=sum(R,ids,j,'fin');if(p<=0)return['–','mut'];const v=(c-p)/p*100;return[(v>0?'+':'')+v.toFixed(1)+'%',v<0?'neg':'pos']}
 function res(){const{L,R}=calc(),ids=S.inv.map(i=>i.id);
 if(!L.length){$('#v').innerHTML='<h1>Mis Inversiones 🤓 JD</h1><div class="card">Aún no hay datos. Ve a <b>Registrar</b> para ingresar tu histórico.</div>';return}
 const last=L.length-1;let ia=rfil.from?L.indexOf(rfil.from):0,ib=rfil.to?L.indexOf(rfil.to):last;
@@ -64,7 +65,7 @@ $('#v').innerHTML=`<h1>Mis Inversiones 🤓 JD</h1>
 ${full?'':'<button class="s" data-a="rall" style="margin:8px 0 0">Ver todo el periodo</button>'}
 <div class="kp" style="margin-top:12px"><div><small>${full?'Saldo total':'Saldo a '+lab(L[ib])}</small><b>$${f(tot)}</b></div><div><small>${full?'Total invertido':'Aportes del periodo'}</small><b>$${f(ap)}</b></div><div><small>Rendimientos</small><b class="${cl(ren)}">$${f(ren)}</b></div><div><small>Rentabilidad</small><b class="${cl(ren)}">${base?(ren/base*100).toFixed(1):0}%</b></div></div>
 <h2>Por inversión</h2>${S.inv.map(i=>card(i.name,R[i.id])).join('')}
-<h2>Consolidado mensual</h2><div class="card sc"><table><tr><th>Mes</th><th>Aporte</th><th>Interés</th><th>Saldo</th></tr>${rg.slice().reverse().map(j=>`<tr><td>${lab(L[j])}</td><td>${f(sum(R,ids,j,'ap'))}</td><td class="${cl(sum(R,ids,j,'int'))}">${f(sum(R,ids,j,'int'))}</td><td><b>${f(sum(R,ids,j,'fin'))}</b></td></tr>`).join('')}</table></div>`}
+<h2>Consolidado mensual</h2><div class="card sc"><table><tr><th>Mes</th><th>Aporte</th><th>Interés</th><th>Saldo</th><th>Var.</th></tr>${rg.slice().reverse().map(j=>`<tr><td>${lab(L[j])}</td><td>${f(sum(R,ids,j,'ap'))}</td><td class="${cl(sum(R,ids,j,'int'))}">${f(sum(R,ids,j,'int'))}</td><td><b>${f(sum(R,ids,j,'fin'))}</b></td><td class="${vr(L,R,ids,j)[1]}">${vr(L,R,ids,j)[0]}</td></tr>`).join('')}</table></div>`}
 
 function tg(k){const s=fil.sel,i=s.indexOf(k);i<0?s.push(k):s.splice(i,1);if(!s.length)s.push('total');gra()}
 function gra(){tab='gra';nav();if(c1){c1.destroy();c1=null}if(c2){c2.destroy();c2=null}if(c3){c3.destroy();c3=null}const{L,R}=calc();
