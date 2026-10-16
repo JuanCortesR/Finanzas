@@ -38,7 +38,16 @@ const MN=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic
 const lab=k=>{const[y,m]=k.split('-');return MN[m-1]+' '+y.slice(2)};
 const nxt=k=>{let[y,m]=k.split('-').map(Number);m++;if(m>12){m=1;y++}return y+'-'+String(m).padStart(2,'0')};
 const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const COL=['#3b82f6','#9ca3af','#38bdf8','#6366f1','#64748b','#22d3ee','#a5b4fc'];
+const TH={azul:{n:'Azul',ac:'#3b82f6',ok:'#60a5fa',col:['#3b82f6','#9ca3af','#38bdf8','#6366f1','#64748b','#22d3ee','#a5b4fc']},
+morado:{n:'Morado',ac:'#8b5cf6',ok:'#a78bfa',col:['#8b5cf6','#9ca3af','#c084fc','#6d28d9','#64748b','#d8b4fe','#a78bfa']},
+rosa:{n:'Rosa',ac:'#ec4899',ok:'#f472b6',col:['#ec4899','#9ca3af','#f9a8d4','#be185d','#64748b','#fb7185','#f0abfc']},
+verde:{n:'Verde',ac:'#10b981',ok:'#34d399',col:['#10b981','#9ca3af','#6ee7b7','#059669','#64748b','#2dd4bf','#86efac']},
+naranja:{n:'Naranja',ac:'#f97316',ok:'#fb923c',col:['#f97316','#9ca3af','#fdba74','#c2410c','#64748b','#fbbf24','#fcd34d']}};
+let tema='azul',COL;try{tema=localStorage.getItem('inv_th')||'azul'}catch(e){}
+if(!TH[tema])tema='azul';
+function applyTh(){const t=TH[tema],r=document.documentElement.style;r.setProperty('--ac',t.ac);r.setProperty('--ok',t.ok);COL=t.col}
+applyTh();
+function setTh(k){tema=k;try{localStorage.setItem('inv_th',k)}catch(e){}applyTh();aju()}
 function mlist(){const ks=Object.keys(S.e).sort();if(!ks.length)return[];const o=[];let k=ks[0];while(k<=ks[ks.length-1]){o.push(k);k=nxt(k)}return o}
 function calc(){const L=mlist(),R={};S.inv.forEach(i=>{let s=0;R[i.id]=L.map(m=>{const v=(S.e[m]||{})[i.id]||[0,0];const ini=s;s=ini+v[0]+v[1];return{m,ini,ap:v[0],int:v[1],fin:s}})});return{L,R}}
 const sum=(R,ids,j,k)=>ids.reduce((a,id)=>a+R[id][j][k],0);
@@ -83,7 +92,7 @@ const sc={x:{ticks:{color:mut},grid:{color:ln}},y:{ticks:{color:mut,callback:v=>
 const tip={callbacks:{label:c=>c.dataset.label+': $'+f(c.parsed.y)}};
 c1=new Chart($('#c1'),{type:'line',data:{labels:labs,datasets:ds},options:{responsive:true,plugins:{legend:{labels:{color:mut}},tooltip:tip},scales:sc}});
 let ca=0,cg=0;const inv=[],gan=[];L.forEach((m,j)=>{ca+=sum(R,sel,j,'ap');cg+=sum(R,sel,j,'int');inv.push(ca);gan.push(cg)});
-c2=new Chart($('#c2'),{type:'bar',data:{labels:labs,datasets:[{label:'Invertido',data:idx.map(j=>inv[j]),backgroundColor:'#64748b'},{label:'Rendimientos',data:idx.map(j=>gan[j]),backgroundColor:'#3b82f6'}]},options:{responsive:true,plugins:{legend:{labels:{color:mut}},tooltip:tip},scales:{x:{...sc.x,stacked:true},y:{...sc.y,stacked:true}}}});
+c2=new Chart($('#c2'),{type:'bar',data:{labels:labs,datasets:[{label:'Invertido',data:idx.map(j=>inv[j]),backgroundColor:'#64748b'},{label:'Rendimientos',data:idx.map(j=>gan[j]),backgroundColor:COL[0]}]},options:{responsive:true,plugins:{legend:{labels:{color:mut}},tooltip:tip},scales:{x:{...sc.x,stacked:true},y:{...sc.y,stacked:true}}}});
 const jj=L.indexOf(fil.to),vals=S.inv.map(i=>R[i.id][jj].fin),tt=vals.reduce((a,b)=>a+b,0)||1;
 c3=new Chart($('#c3'),{type:'pie',data:{labels:S.inv.map((i,k)=>i.name+' '+(vals[k]/tt*100).toFixed(1)+'%'),datasets:[{data:vals,backgroundColor:S.inv.map((i,k)=>COL[k%7]),borderColor:'#141517',borderWidth:2}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{color:mut}},tooltip:{callbacks:{label:c=>' $'+f(c.parsed)}}}}})}
 
@@ -111,8 +120,9 @@ function aju(){tab='aju';rcf=0;nav();
 $('#v').innerHTML=`<h1>Ajustes</h1>${S.inv.length?'':'<div class="card"><b>¡Bienvenido!</b><br>Empieza agregando tus inversiones (ej: Cajita, Dafuturo). Luego ve a <b>Registrar</b> y carga tus meses históricos.</div>'}
 <div class="card"><b>Mis inversiones</b>${S.inv.map(i=>ed==i.id?`<div class="row" style="margin-top:8px"><input id="en" value="${esc(i.name)}"><button data-a="rsave" data-p="${i.id}" style="width:auto;margin:0">Guardar</button></div>`:`<div class="row" style="justify-content:space-between;margin-top:8px"><span>${esc(i.name)}</span><span><button class="d" data-a="ren" data-p="${i.id}" style="color:var(--ac)">Renombrar</button> <button class="d" data-a="del" data-p="${i.id}">${cf==i.id?'¿Seguro? Toca otra vez':'Eliminar'}</button></span></div>`).join('')}
 <div class="row" style="margin-top:12px"><input id="ni" placeholder="Nombre de la inversión"><button data-a="addI" style="width:auto;margin:0">Agregar</button></div></div>
+<div class="card"><b>Tema de color</b><div class="mut">Elige el color de la app. Los negros y grises se mantienen.</div><div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:12px">${Object.keys(TH).map(k=>`<div style="text-align:center"><button data-a="th" data-p="${k}" aria-label="${TH[k].n}" style="width:46px;height:46px;border-radius:50%;padding:0;margin:0;background:${TH[k].ac};border:3px solid ${tema==k?'#fff':'transparent'}"></button><div class="mut" style="margin-top:4px;font-size:12px">${TH[k].n}</div></div>`).join('')}</div></div>
 <div class="card"><b>Respaldo de datos</b><div class="mut">Tus datos se guardan en este dispositivo. Toca "Generar y copiar respaldo": aparece un texto en el cuadro; guárdalo en Notas. Para recuperar tus datos, pega ese texto en el cuadro y toca Restaurar.</div><button data-a="bk">Generar y copiar respaldo</button><div id="msg" class="mut" style="margin-top:8px"></div><textarea id="bx" rows="4" placeholder="Aquí aparece tu respaldo / pega uno para restaurar" style="width:100%;font:13px monospace;background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:10px;padding:8px;margin-top:8px"></textarea><button class="s" data-a="rs">Restaurar respaldo</button></div>`}
-const A={go:t=>go(t),rall:()=>{rfil={from:null,to:null};res()},tg,sv,addI,bk,rs,ren,del,rsave};
+const A={th:setTh,go:t=>go(t),rall:()=>{rfil={from:null,to:null};res()},tg,sv,addI,bk,rs,ren,del,rsave};
 document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(t&&A[t.dataset.a])A[t.dataset.a](t.dataset.p)});
 document.addEventListener('change',e=>{const c=e.target.dataset.c;if(!c)return;const v=e.target.value;if(c=='from'){fil.from=v;gra()}else if(c=='to'){fil.to=v;gra()}else if(c=='rm'){rm=v||rm;reg()}else if(c=='rfrom'){const L=mlist();rfil.from=v==L[0]?null:v;if(rfil.to&&rfil.to<v)rfil.to=v;res()}else if(c=='rto'){const L=mlist();rfil.to=v==L[L.length-1]?null:v;if(rfil.from&&rfil.from>v)rfil.from=v;res()}});
 document.addEventListener('input',e=>{if(e.target.dataset.i=='upd')upd()});
