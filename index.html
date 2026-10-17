@@ -59,22 +59,22 @@ function render(){nav();if(c1){c1.destroy();c1=null}if(c2){c2.destroy();c2=null}
 if(!S.inv.length&&tab!='aju')tab='aju';
 ({res,gra,reg,aju})[tab]();window.scrollTo(0,0)}
 
-let rfil={from:null,to:null};
+let rfil={from:null,to:null},rinv=null;
 function vr(L,R,ids,j){if(j<1)return['–','mut'];const p=sum(R,ids,j-1,'fin'),c=sum(R,ids,j,'fin');if(p<=0)return['–','mut'];const v=(c-p)/p*100;return[(v>0?'+':'')+v.toFixed(1)+'%',v<0?'neg':'pos']}
-function res(){const{L,R}=calc(),ids=S.inv.map(i=>i.id);
+function res(){const{L,R}=calc(),all=S.inv.map(i=>i.id);if(rinv&&!all.includes(rinv))rinv=null;const ids=rinv?[rinv]:all,rn=rinv?S.inv.find(i=>i.id==rinv).name:'';
 if(!L.length){$('#v').innerHTML='<h1>Mis Inversiones 🤓 JD</h1><div class="card">Aún no hay datos. Ve a <b>Registrar</b> para ingresar tu histórico.</div>';return}
 const last=L.length-1;let ia=rfil.from?L.indexOf(rfil.from):0,ib=rfil.to?L.indexOf(rfil.to):last;
 if(ia<0)ia=0;if(ib<0)ib=last;if(ia>ib)ib=ia;
 const full=ia==0&&ib==last,rg=[];for(let j=ia;j<=ib;j++)rg.push(j);
 const tot=sum(R,ids,ib,'fin'),ap=rg.reduce((x,j)=>x+sum(R,ids,j,'ap'),0),ren=rg.reduce((x,j)=>x+sum(R,ids,j,'int'),0),base=sum(R,ids,ia,'ini')+ap;
-const card=(nm,r)=>{const x=r.slice(ia,ib+1),a=x.reduce((p,q)=>p+q.ap,0),g=x.reduce((p,q)=>p+q.int,0);return`<div class="card"><b>${esc(nm)}</b><div class="mut">Saldo ${full?'actual':'a '+lab(L[ib])}</div><div style="font-size:22px;font-weight:700">$${f(x[x.length-1].fin)}</div><div class="mut">${full?'Invertido':'Aportes'} $${f(a)} · Rendimientos <span class="${cl(g)}">$${f(g)}</span></div></div>`};
+const card=(nm,r,id)=>{const x=r.slice(ia,ib+1),a=x.reduce((p,q)=>p+q.ap,0),g=x.reduce((p,q)=>p+q.int,0);return`<div class="card" ${rinv?'':`data-a="pick" data-p="${id}" style="cursor:pointer"`}><b>${esc(nm)}</b>${rinv?'':'<span class="mut" style="float:right">Ver detalle ›</span>'}<div class="mut">Saldo ${full?'actual':'a '+lab(L[ib])}</div><div style="font-size:22px;font-weight:700">$${f(x[x.length-1].fin)}</div><div class="mut">${full?'Invertido':'Aportes'} $${f(a)} · Rendimientos <span class="${cl(g)}">$${f(g)}</span></div></div>`};
 const opt=(v)=>L.map((m,j)=>`<option value="${m}" ${j==v?'selected':''}>${lab(m)}</option>`).join('');
 $('#v').innerHTML=`<h1>Mis Inversiones 🤓 JD</h1>
-<div class="g2"><div><label>Desde</label><select data-c="rfrom">${opt(ia)}</select></div><div><label>Hasta</label><select data-c="rto">${opt(ib)}</select></div></div>
+${rinv?`<button class="s" data-a="pickall" style="margin:0 0 10px">← Ver todas las inversiones</button><h2 style="margin:4px 0 8px">${esc(rn)}</h2>`:''}<div class="g2"><div><label>Desde</label><select data-c="rfrom">${opt(ia)}</select></div><div><label>Hasta</label><select data-c="rto">${opt(ib)}</select></div></div>
 ${full?'':'<button class="s" data-a="rall" style="margin:8px 0 0">Ver todo el periodo</button>'}
 <div class="kp" style="margin-top:12px"><div><small>${full?'Saldo total':'Saldo a '+lab(L[ib])}</small><b>$${f(tot)}</b></div><div><small>${full?'Total invertido':'Aportes del periodo'}</small><b>$${f(ap)}</b></div><div><small>Rendimientos</small><b class="${cl(ren)}">$${f(ren)}</b></div><div><small>Rentabilidad</small><b class="${cl(ren)}">${base?(ren/base*100).toFixed(1):0}%</b></div></div>
-<h2>Por inversión</h2>${S.inv.map(i=>card(i.name,R[i.id])).join('')}
-<h2>Consolidado mensual</h2><div class="card sc"><table><tr><th>Mes</th><th>Aporte</th><th>Interés</th><th>Saldo</th><th>Var.</th></tr>${rg.slice().reverse().map(j=>`<tr><td>${lab(L[j])}</td><td>${f(sum(R,ids,j,'ap'))}</td><td class="${cl(sum(R,ids,j,'int'))}">${f(sum(R,ids,j,'int'))}</td><td><b>${f(sum(R,ids,j,'fin'))}</b></td><td class="${vr(L,R,ids,j)[1]}">${vr(L,R,ids,j)[0]}</td></tr>`).join('')}</table></div>`}
+<h2>${rinv?'Inversión':'Por inversión'}</h2>${S.inv.filter(i=>!rinv||i.id==rinv).map(i=>card(i.name,R[i.id],i.id)).join('')}
+<h2>${rinv?'Detalle mensual':'Consolidado mensual'}</h2><div class="card sc"><table><tr><th>Mes</th><th>Aporte</th><th>Interés</th><th>Saldo</th><th>Var.</th></tr>${rg.slice().reverse().map(j=>`<tr><td>${lab(L[j])}</td><td>${f(sum(R,ids,j,'ap'))}</td><td class="${cl(sum(R,ids,j,'int'))}">${f(sum(R,ids,j,'int'))}</td><td><b>${f(sum(R,ids,j,'fin'))}</b></td><td class="${vr(L,R,ids,j)[1]}">${vr(L,R,ids,j)[0]}</td></tr>`).join('')}</table></div>`}
 
 function tg(k){const s=fil.sel,i=s.indexOf(k);i<0?s.push(k):s.splice(i,1);if(!s.length)s.push('total');gra()}
 function gra(){tab='gra';nav();if(c1){c1.destroy();c1=null}if(c2){c2.destroy();c2=null}if(c3){c3.destroy();c3=null}const{L,R}=calc();
@@ -122,7 +122,7 @@ $('#v').innerHTML=`<h1>Ajustes</h1>${S.inv.length?'':'<div class="card"><b>¡Bie
 <div class="row" style="margin-top:12px"><input id="ni" placeholder="Nombre de la inversión"><button data-a="addI" style="width:auto;margin:0">Agregar</button></div></div>
 <div class="card"><b>Tema de color</b><div class="mut">Elige el color de la app. Los negros y grises se mantienen.</div><div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:12px">${Object.keys(TH).map(k=>`<div style="text-align:center"><button data-a="th" data-p="${k}" aria-label="${TH[k].n}" style="width:46px;height:46px;border-radius:50%;padding:0;margin:0;background:${TH[k].ac};border:3px solid ${tema==k?'#fff':'transparent'}"></button><div class="mut" style="margin-top:4px;font-size:12px">${TH[k].n}</div></div>`).join('')}</div></div>
 <div class="card"><b>Respaldo de datos</b><div class="mut">Tus datos se guardan en este dispositivo. Toca "Generar y copiar respaldo": aparece un texto en el cuadro; guárdalo en Notas. Para recuperar tus datos, pega ese texto en el cuadro y toca Restaurar.</div><button data-a="bk">Generar y copiar respaldo</button><div id="msg" class="mut" style="margin-top:8px"></div><textarea id="bx" rows="4" placeholder="Aquí aparece tu respaldo / pega uno para restaurar" style="width:100%;font:13px monospace;background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:10px;padding:8px;margin-top:8px"></textarea><button class="s" data-a="rs">Restaurar respaldo</button></div>`}
-const A={th:setTh,go:t=>go(t),rall:()=>{rfil={from:null,to:null};res()},tg,sv,addI,bk,rs,ren,del,rsave};
+const A={pick:id=>{rinv=id;res();window.scrollTo(0,0)},pickall:()=>{rinv=null;res();window.scrollTo(0,0)},th:setTh,go:t=>{if(t=='res')rinv=null;go(t)},rall:()=>{rfil={from:null,to:null};res()},tg,sv,addI,bk,rs,ren,del,rsave};
 document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(t&&A[t.dataset.a])A[t.dataset.a](t.dataset.p)});
 document.addEventListener('change',e=>{const c=e.target.dataset.c;if(!c)return;const v=e.target.value;if(c=='from'){fil.from=v;gra()}else if(c=='to'){fil.to=v;gra()}else if(c=='rm'){rm=v||rm;reg()}else if(c=='rfrom'){const L=mlist();rfil.from=v==L[0]?null:v;if(rfil.to&&rfil.to<v)rfil.to=v;res()}else if(c=='rto'){const L=mlist();rfil.to=v==L[L.length-1]?null:v;if(rfil.from&&rfil.from>v)rfil.from=v;res()}});
 document.addEventListener('input',e=>{if(e.target.dataset.i=='upd')upd()});
