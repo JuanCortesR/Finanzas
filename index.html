@@ -27,13 +27,22 @@ nav:empty{display:none}
 .hc::before{content:"";position:absolute;inset:0;background:radial-gradient(110% 80% at 0% 0%,rgba(255,255,255,.2),rgba(255,255,255,0) 60%);pointer-events:none}
 .hc::after{content:"";position:absolute;left:0;right:0;bottom:0;height:46%;background:linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,.05));pointer-events:none}
 .hic{position:relative;width:54px;height:54px;border-radius:18px;display:grid;place-items:center;font-size:26px;margin-bottom:14px;background:linear-gradient(180deg,rgba(255,255,255,.3),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.2);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 8px 22px rgba(0,0,0,.35)}
-.spk{position:absolute;right:16px;top:18px;width:132px;height:66px;opacity:.8;-webkit-mask-image:linear-gradient(90deg,transparent,#000 55%);mask-image:linear-gradient(90deg,transparent,#000 55%)}
+.spk{position:absolute;right:12px;top:14px;width:158px;height:79px}
 .ht{font-size:21px;font-weight:700;position:relative}.hl{font-size:13px;color:rgba(255,255,255,.66);position:relative}.hv{font-size:27px;font-weight:700;position:relative;margin:2px 0}
 .hgo{position:absolute;right:18px;bottom:14px;font-size:28px;color:rgba(255,255,255,.6)}
 .hb{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;margin:0;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}input[type=checkbox]{width:26px;height:26px;padding:0;accent-color:var(--ac)}.prow{display:grid;grid-template-columns:30px 1fr 118px;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--ln)}nav button{flex:1;background:none;color:var(--mut);border:0;border-radius:0;margin:0;padding:12px 2px;font-size:13px}nav button.on{color:var(--ac)}
 .row{display:flex;gap:8px;align-items:center}.row input{flex:1}
 canvas{max-height:260px}
-.th{position:fixed;z-index:98;border-radius:14px;border:2px solid var(--ac);box-shadow:0 0 0 9999px rgba(0,0,0,.78);animation:pl 1.4s ease-in-out infinite;transition:all .25s}@keyframes pl{0%,100%{box-shadow:0 0 0 9999px rgba(0,0,0,.78),0 0 0 0 var(--ac)}50%{box-shadow:0 0 0 9999px rgba(0,0,0,.78),0 0 20px 6px var(--ac)}}.tc{position:fixed;z-index:99;background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:16px;box-shadow:0 10px 40px rgba(0,0,0,.6)}</style></head><body><main id="v"></main>
+.th{position:fixed;z-index:98;border-radius:14px;border:2px solid var(--ac);box-shadow:0 0 0 9999px rgba(0,0,0,.78);animation:pl 1.4s ease-in-out infinite;transition:all .25s}@keyframes pl{0%,100%{box-shadow:0 0 0 9999px rgba(0,0,0,.78),0 0 0 0 var(--ac)}50%{box-shadow:0 0 0 9999px rgba(0,0,0,.78),0 0 20px 6px var(--ac)}}.tc{position:fixed;z-index:99;background:var(--card);border:1px solid var(--ln);border-radius:16px;padding:16px;box-shadow:0 10px 40px rgba(0,0,0,.6)}
+.card,.kp div,.tip{background:#10131a;background:radial-gradient(110% 80% at 0% 0%,rgba(255,255,255,.13),rgba(255,255,255,0) 60%),linear-gradient(135deg,color-mix(in srgb,var(--ac) 24%,#0a0c11) 0%,#0c0e13 82%);border:1px solid rgba(255,255,255,.09);border-radius:20px;box-shadow:0 10px 28px rgba(0,0,0,.42)}
+main button:not(.s):not(.d):not(.chip),.tip button:not(.s){background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),var(--ac);border-radius:16px;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 8px 20px rgba(0,0,0,.35)}
+main button.s,.tip button.s{background:radial-gradient(120% 90% at 0% 0%,rgba(255,255,255,.16),rgba(255,255,255,0) 60%),rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:16px;color:var(--tx)}
+main input:not([type=checkbox]),main select,main textarea{background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.12);border-radius:14px}
+main .chip{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
+main .chip.on{background:linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,0) 55%),var(--ac);border-color:transparent}
+nav{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,0) 60%),#0c0e13;border-top:1px solid rgba(255,255,255,.09)}
+.hs{min-height:0;padding:16px;margin:0;display:flex;align-items:center;justify-content:center;gap:10px;font-weight:600;font-size:17px}
+</style></head><body><main id="v"></main>
 <nav id="nav"></nav>
 <script>
 const $=s=>document.querySelector(s);
@@ -142,17 +151,20 @@ for(let i=0;i<38;i++){const o=p;p+=(rnd()-.52)*46;p=Math.max(260,Math.min(780,p)
 let g='';cs.forEach((q,i)=>{const x=12+i*10,col=q[1]<q[0]?ac:'#64748b';g+=`<line x1="${x+3}" x2="${x+3}" y1="${q[2]}" y2="${q[3]}" stroke="${col}" stroke-width="1.6"/><rect x="${x}" y="${Math.min(q[0],q[1])}" width="6" height="${Math.max(3,Math.abs(q[0]-q[1]))}" rx="1.2" fill="${col}"/>`});
 const pts=cs.map((q,i)=>`${15+i*10},${(q[0]+q[1])/2}`).join(' ');
 return`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 900" preserveAspectRatio="xMidYMid slice"><defs><filter id="b" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="2.6"/></filter><linearGradient id="a" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${ac}" stop-opacity=".45"/><stop offset="1" stop-color="${ac}" stop-opacity="0"/></linearGradient></defs><rect width="400" height="900" fill="#000"/><g filter="url(#b)" opacity=".55">${[300,420,540,660,780].map(y=>`<line x1="0" x2="400" y1="${y}" y2="${y}" stroke="#fff" stroke-opacity=".12"/>`).join('')}<polygon points="12,900 ${pts} 387,900" fill="url(#a)"/>${g}<polyline points="${pts}" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="2.4"/></g></svg>`}
+function spk(ys){const n=ys.length,w=160,h=80,dx=(w-24)/(n-1),P=ys.map((y,i)=>[12+i*dx,y]);let d=`M${P[0][0]},${P[0][1]}`;
+for(let i=0;i<n-1;i++){const a=P[i-1]||P[i],b=P[i],c=P[i+1],e=P[i+2]||c;d+=`C${b[0]+(c[0]-a[0])/6},${b[1]+(c[1]-a[1])/6} ${c[0]-(e[0]-b[0])/6},${c[1]-(e[1]-b[1])/6} ${c[0]},${c[1]}`}
+const bars=P.map(p=>`<rect x="${p[0]-5}" y="${p[1]+8}" width="10" height="${h-p[1]-8}" rx="3.5" fill="url(#gb)"/>`).join(''),l=P[n-1];
+return`<svg class="spk" viewBox="0 0 160 80"><defs><linearGradient id="gb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".2"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>${bars}<path d="${d} L${l[0]},${h} L${P[0][0]},${h}Z" fill="url(#ga)"/><path d="${d}" fill="none" stroke="#fff" stroke-opacity=".92" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${l[0]}" cy="${l[1]}" r="7" fill="#fff" fill-opacity=".18"/><circle cx="${l[0]}" cy="${l[1]}" r="3.2" fill="#fff"/></svg>`}
 function home(){const pml=Object.keys(S.p.e).sort(),{L,R}=calc(),ids=S.inv.map(i=>i.id),ti=L.length?sum(R,ids,L.length-1,'fin'):null,dd=dcalc(),dl=dd.L.length-1,td=dl>=0?dsum(dd.V,S.d.items.map(i=>i.id),dl):null,cu=dl>=0?S.d.items.filter(i=>dd.V[i.id][dl]>0).reduce((a,i)=>a+(i.cuota||0),0):0;
 const pm=pml[pml.length-1],pt=pm?pcalc(pm).t:null,pj=pt?(pt.ir+pt.ip)-(pt.real+pt.pend):0,hi=pt&&(pt.ie>0||pt.ir>0);
 const v=$('#v');v.style.backgroundImage=`linear-gradient(180deg,rgba(0,0,0,.3),rgba(0,0,0,.88) 82%),url("data:image/svg+xml;utf8,${encodeURIComponent(mkbg(TH[tema].ac))}")`;v.style.backgroundSize='cover';v.style.backgroundPosition='center';
-const sp=d=>`<svg class="spk" viewBox="0 0 120 60" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`,
-up=sp('<path d="M3 52 C20 50 28 38 44 40 S70 22 84 24 S104 8 117 6"/><circle cx="117" cy="6" r="4" fill="#fff"/>'),dw=sp('<path d="M3 8 C20 10 30 24 46 22 S72 40 86 38 S106 50 117 52"/><circle cx="117" cy="52" r="4" fill="#fff"/>'),br=sp('<path d="M14 54V38M38 54V28M62 54V34M86 54V16M110 54V8" stroke-width="9"/>'),
+const up=spk([60,54,57,46,48,36,32,22,16]),dw=spk([16,22,19,30,34,40,38,50,56]),br=spk([42,30,46,36,50,32,44,28,38]),
 card=(k,ic,t,lb,val,sub,sv)=>`<div class="hc" data-a="mod" data-p="${k}">${sv}<div class="hic">${ic}</div><div class="ht">${t}</div><div class="hl">${lb}</div>${val?`<div class="hv">${val}</div>`:''}${sub?`<div class="hl">${sub}</div>`:''}<span class="hgo">›</span></div>`;
 $('#v').innerHTML=`<h1 style="margin:10px 0 2px;font-size:30px">Plata Clara 🤓</h1><div class="hl" style="margin:0 0 20px;font-size:15px">Tu plata, en un solo lugar</div>
 ${card('inv','📈','Inversiones',ti==null?'Registra tus inversiones':'Saldo total',ti==null?'':'$'+f(ti),'',up)}
 ${card('deu','💳','Deudas',td==null?'Registra tus créditos y tarjetas':'Deuda total',td==null?'':'$'+f(td),cu?'Cuotas $'+f(cu)+' al mes':'',dw)}
 ${card('pre','🧾','Presupuesto mensual',pm?'Gastado en '+lab(pm):'Planea y controla tus gastos',pm?'$'+f(pt.real):'',pm&&hi?'Te queda a fin de mes $'+f(pj):'',br)}
-<div class="g2" style="margin-top:4px"><button class="s hb" data-a="help">❓ Ayuda</button><button class="s hb" data-a="setg">⚙️ Ajustes</button></div>`}
+<div class="g2" style="margin-top:4px"><div class="hc hs" data-a="help"><span>❓</span>Ayuda</div><div class="hc hs" data-a="setg"><span>⚙️</span>Ajustes</div></div>`}
 function dres(){tab='res';nav();const{L,V}=dcalc(),D=S.d;
 if(!L.length){$('#v').innerHTML='<h1>Deudas</h1><div class="card">Aún no hay deudas registradas. Ve a <b>Registrar</b> y agrega tus créditos.</div>';return}
 const j=L.length-1,es=[...new Set(D.items.map(i=>i.ent))];if(dbank&&!es.includes(dbank))dbank=null;
