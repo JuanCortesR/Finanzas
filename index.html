@@ -59,7 +59,8 @@ const TH={azul:{n:'Azul',ac:'#3b82f6',ok:'#60a5fa',col:['#3b82f6','#9ca3af','#38
 morado:{n:'Morado',ac:'#8b5cf6',ok:'#a78bfa',col:['#8b5cf6','#9ca3af','#c084fc','#6d28d9','#64748b','#d8b4fe','#a78bfa']},
 rosa:{n:'Rosa',ac:'#ec4899',ok:'#f472b6',col:['#ec4899','#9ca3af','#f9a8d4','#be185d','#64748b','#fb7185','#f0abfc']},
 verde:{n:'Verde',ac:'#10b981',ok:'#34d399',col:['#10b981','#9ca3af','#6ee7b7','#059669','#64748b','#2dd4bf','#86efac']},
-naranja:{n:'Naranja',ac:'#f97316',ok:'#fb923c',col:['#f97316','#9ca3af','#fdba74','#c2410c','#64748b','#fbbf24','#fcd34d']}};
+naranja:{n:'Naranja',ac:'#f97316',ok:'#fb923c',col:['#f97316','#9ca3af','#fdba74','#c2410c','#64748b','#fbbf24','#fcd34d']},
+rojo:{n:'Rojo',ac:'#ef4444',ok:'#fecaca',col:['#ef4444','#9ca3af','#fca5a5','#b91c1c','#64748b','#fb923c','#fecaca']}};
 let tema='azul',COL;try{tema=localStorage.getItem('inv_th')||'azul'}catch(e){}
 if(!TH[tema])tema='azul';
 function applyTh(){const t=TH[tema],r=document.documentElement.style;r.setProperty('--ac',t.ac);r.setProperty('--ok',t.ok);COL=t.col}
@@ -69,12 +70,12 @@ function mlist(){const ks=Object.keys(S.e).sort();if(!ks.length)return[];const o
 function calc(){const L=mlist(),R={};S.inv.forEach(i=>{let s=0;R[i.id]=L.map(m=>{const v=(S.e[m]||{})[i.id]||[0,0];const ini=s;s=ini+v[0]+v[1];return{m,ini,ap:v[0],int:v[1],fin:s}})});return{L,R}}
 const sum=(R,ids,j,k)=>ids.reduce((a,id)=>a+R[id][j][k],0);
 const cl=n=>n<0?'neg':'pos';
-function nav(){const t=[['res','📊','Resumen'],['gra','📈','Gráficas'],['reg','✏️','Registrar'],['aju','⚙️','Ajustes'],['home','🏠','Inicio']];
-$('#nav').innerHTML=!mod?'':(mod=='deu'?[t[0],t[1],t[2],t[4]]:mod=='pre'?[t[0],t[1],['mes','✅','Mes'],['cfg','🛠️','Configurar'],t[4]]:t).map(x=>`<button class="${tab==x[0]?'on':''}" data-a="go" data-p="${x[0]}">${x[1]}<br>${x[2]}</button>`).join('')}
+function nav(){const t=[['res','📊','Resumen'],['gra','📈','Gráficas'],['reg','✏️','Registrar'],['cfg','🛠️','Configurar'],['home','🏠','Inicio']];
+$('#nav').innerHTML=!mod?'':(mod=='ajs'?[t[4]]:mod=='deu'?[t[0],t[1],t[2],t[4]]:mod=='pre'?[t[0],t[1],['mes','✅','Mes'],['cfg','🛠️','Configurar'],t[4]]:t).map(x=>`<button class="${tab==x[0]?'on':''}" data-a="go" data-p="${x[0]}">${x[1]}<br>${x[2]}</button>`).join('')}
 function go(t){if(t=='home'){mod=null;render();return}tab=t;render()}
 function render(){$('#v').style.backgroundImage='';nav();if(c1){c1.destroy();c1=null}if(c2){c2.destroy();c2=null}if(c3){c3.destroy();c3=null}
-if(!mod){home();return}if(mod=='deu'){const T={res:dres,gra:dgra,reg:dreg};T[tab]?T[tab]():dres();$('#v').scrollTop=0;return}if(mod=='pre'){const T={res:pres,gra:pgra,mes:pmes,cfg:pcfg};T[tab]?T[tab]():pres();$('#v').scrollTop=0;return}if(!S.inv.length&&tab!='aju')tab='aju';
-({res,gra,reg,aju})[tab]();$('#v').scrollTop=0}
+if(!mod){home();return}if(mod=='ajs'){aju();$('#v').scrollTop=0;return}if(mod=='deu'){const T={res:dres,gra:dgra,reg:dreg};T[tab]?T[tab]():dres();$('#v').scrollTop=0;return}if(mod=='pre'){const T={res:pres,gra:pgra,mes:pmes,cfg:pcfg};T[tab]?T[tab]():pres();$('#v').scrollTop=0;return}if(!S.inv.length&&tab!='cfg')tab='cfg';
+({res,gra,reg,cfg:icfg})[tab]();$('#v').scrollTop=0}
 
 let rfil={from:null,to:null},rinv=null;
 function vr(L,R,ids,j){if(j<1)return['–','mut'];const p=sum(R,ids,j-1,'fin'),c=sum(R,ids,j,'fin');if(p<=0)return['–','mut'];const v=(c-p)/p*100;return[(v>0?'+':'')+v.toFixed(1)+'%',v<0?'neg':'pos']}
@@ -125,20 +126,23 @@ el.value=(neg?'-':'')+ent+(hc?','+dec:'')}
 function upd(){S.inv.forEach(i=>{const a=num($('#a_'+i.id)),g=num($('#g_'+i.id));$('#f_'+i.id).textContent='$'+f(iniOf(i.id,rm)+a+g)})}
 function sv(){S.e[rm]=S.e[rm]||{};S.inv.forEach(i=>{S.e[rm][i.id]=[num($('#a_'+i.id)),num($('#g_'+i.id))]});save();rm=nxt(rm);tab='res';render()}
 
-function addI(){const n=$('#ni').value.trim();if(!n)return;S.inv.push({id:'i'+Date.now(),name:n});save();aju()}
-function ren(id){ed=id;aju()}
-function rsave(id){const n=$('#en').value.trim();if(n){S.inv.find(x=>x.id==id).name=n;save()}ed='';aju()}
-function del(id){if(cf!=id){cf=id;aju();return}S.inv=S.inv.filter(i=>i.id!=id);Object.values(S.e).forEach(e=>delete e[id]);fil.sel=['total'];cf='';save();aju()}
+function addI(){const n=$('#ni').value.trim();if(!n)return;S.inv.push({id:'i'+Date.now(),name:n});save();icfg()}
+function ren(id){ed=id;icfg()}
+function rsave(id){const n=$('#en').value.trim();if(n){S.inv.find(x=>x.id==id).name=n;save()}ed='';icfg()}
+function del(id){if(cf!=id){cf=id;icfg();return}S.inv=S.inv.filter(i=>i.id!=id);Object.values(S.e).forEach(e=>delete e[id]);fil.sel=['total'];cf='';save();icfg()}
 function bk(){const t=JSON.stringify(S),b=$('#bx');b.value=t;b.focus();b.select();b.setSelectionRange(0,t.length);let ok=false;try{ok=document.execCommand('copy')}catch(e){}
 try{navigator.clipboard&&navigator.clipboard.writeText(t).then(()=>ok=true).catch(()=>{})}catch(e){}
 $('#msg').textContent=ok?'✅ Respaldo copiado. Pégalo en Notas para guardarlo.':'Respaldo generado en el cuadro. Si no se copió: mantén presionado el texto → Seleccionar todo → Copiar, y pégalo en Notas.'}
 function rs(){let d;try{d=JSON.parse($('#bx').value);if(!d.inv||!d.e)throw 0}catch(e){$('#msg').textContent='❌ El respaldo no es válido. Pega primero el texto completo.';return}
 if(!rcf){rcf=1;$('#msg').textContent='Esto reemplaza tus datos actuales. Toca "Restaurar respaldo" otra vez para confirmar.';return}
-rcf=0;S=d;S.d=S.d||{items:[],e:{}};S.p=S.p||{cats:[],items:[],e:{}};S.p.inc=S.p.inc||[];save();tab='res';render()}
-function aju(){tab='aju';rcf=0;nav();
-$('#v').innerHTML=`<h1>Ajustes</h1>${S.inv.length?'':'<div class="card"><b>¡Bienvenido!</b><br>Empieza agregando tus inversiones (ej: Cajita, Dafuturo). Luego ve a <b>Registrar</b> y carga tus meses históricos.</div>'}
+rcf=0;S=d;S.d=S.d||{items:[],e:{}};S.p=S.p||{cats:[],items:[],e:{}};S.p.inc=S.p.inc||[];save();mod=null;tab='res';render()}
+function icfg(){tab='cfg';nav();
+$('#v').innerHTML=`<h1>Configurar inversiones</h1>${S.inv.length?'':'<div class="card"><b>¡Bienvenido!</b><br>Empieza agregando tus inversiones (ej: Cajita, Dafuturo). Luego ve a <b>Registrar</b> y carga tus meses históricos.</div>'}
 <div class="card"><b>Mis inversiones</b>${S.inv.map(i=>ed==i.id?`<div class="row" style="margin-top:8px"><input id="en" value="${esc(i.name)}"><button data-a="rsave" data-p="${i.id}" style="width:auto;margin:0">Guardar</button></div>`:`<div class="row" style="justify-content:space-between;margin-top:8px"><span>${esc(i.name)}</span><span><button class="d" data-a="ren" data-p="${i.id}" style="color:var(--ac)">Renombrar</button> <button class="d" data-a="del" data-p="${i.id}">${cf==i.id?'¿Seguro? Toca otra vez':'Eliminar'}</button></span></div>`).join('')}
 <div class="row" style="margin-top:12px"><input id="ni" placeholder="Nombre de la inversión"><button data-a="addI" style="width:auto;margin:0">Agregar</button></div></div>
+<div class="mut" style="margin:0 4px">El tema de color y el respaldo están en <b>Ajustes</b>, en la pantalla principal.</div>`}
+function aju(){tab='aju';rcf=0;nav();
+$('#v').innerHTML=`<h1>Ajustes</h1>
 <div class="card"><b>Tema de color</b><div class="mut">Elige el color de la app. Los negros y grises se mantienen.</div><div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:12px">${Object.keys(TH).map(k=>`<div style="text-align:center"><button data-a="th" data-p="${k}" aria-label="${TH[k].n}" style="width:46px;height:46px;border-radius:50%;padding:0;margin:0;background:${TH[k].ac};border:3px solid ${tema==k?'#fff':'transparent'}"></button><div class="mut" style="margin-top:4px;font-size:12px">${TH[k].n}</div></div>`).join('')}</div></div>
 <div class="card"><b>Respaldo de datos</b><div class="mut">Tus datos se guardan en este dispositivo. Toca "Generar y copiar respaldo": aparece un texto en el cuadro; guárdalo en Notas. Para recuperar tus datos, pega ese texto en el cuadro y toca Restaurar.</div><button data-a="bk">Generar y copiar respaldo</button><div id="msg" class="mut" style="margin-top:8px"></div><textarea id="bx" rows="4" placeholder="Aquí aparece tu respaldo / pega uno para restaurar" style="width:100%;font:13px monospace;background:var(--bg);color:var(--tx);border:1px solid var(--ln);border-radius:10px;padding:8px;margin-top:8px"></textarea><button class="s" data-a="rs">Restaurar respaldo</button></div>`}
 const ENTS=['Bancolombia','Davivienda','Banco de Bogotá','BBVA Colombia','Banco de Occidente','Banco Popular','AV Villas','Banco Caja Social','Scotiabank Colpatria','Itaú','Banco GNB Sudameris','Banco Agrario','Bancoomeva','Banco Falabella','Banco Pichincha','Banco W','Bancamía','Banco Mundo Mujer','Banco Finandina','Banco Santander','Banco Serfinanza','Coopcentral','Nu Colombia','Lulo Bank','RappiPay','Nequi','Daviplata','Tuya','Addi','Sistecrédito','Crezcamos','Fondo Nacional del Ahorro','ICETEX','Confiar Cooperativa','Otra'];
@@ -206,7 +210,7 @@ const wr=(t,n=15)=>{const o=[''];t.split(' ').forEach(x=>{const l=o[o.length-1],
 const nem=t=>t.replace(/[\p{Extended_Pictographic}\p{Emoji_Modifier}\uFE0F\u200D]/gu,'').replace(/\s+/g,' ').trim()||t,ylab=t=>{let l=wr(nem(t),14);if(l.length>2)l=[l[0],l.slice(1).join(' ')];return l.map(x=>x.length>15?x.slice(0,14)+'…':x)};
 function nt(id){const el=$('#'+id);if(el)el.outerHTML='<div class="mut" style="padding:16px 0">Registra al menos 2 meses para ver la evolución.</div>'}
 const dn=(H,top,t,v)=>({type:'doughnut',data:{labels:top.map(x=>x[0]+' '+(x[1]/(top.reduce((a,b)=>a+b[1],0)||1)*100).toFixed(1)+'%'),datasets:[{data:top.map(x=>x[1]),backgroundColor:top.map((x,k)=>x[0]=='Otras'?'#475569':H.pal[k%H.pal.length]),borderColor:H.card,borderWidth:3,borderRadius:6,spacing:2,hoverOffset:6}]},options:{cutout:'68%',responsive:true,plugins:{legend:H.lg,tooltip:{...H.tip,callbacks:{label:c=>' $'+f(c.parsed)}}}},plugins:[H.ctr(t,v)]});
-const VER='2026-10-20b',NEWS='Renovamos el diseño de la pantalla principal. Te muestro rápido cómo usar todo.',nv=p=>'#nav button[data-p="'+p+'"]';
+const VER='2026-10-21',NEWS='Nuevo color Rojo para el tema. Los ajustes de tus inversiones ahora están en Configurar, dentro de Inversiones. En Ajustes, en la pantalla principal, quedan el color y el respaldo.',nv=p=>'#nav button[data-p="'+p+'"]';
 const TS=[
 {mo:null,t:'¡Bienvenido a Plata Clara! 🤓',x:'En un minuto te muestro cómo usar la app. Puedes saltar el recorrido cuando quieras.'},
 {mo:null,sel:'[data-a="mod"][data-p="inv"]',t:'Inversiones 📈',x:'Registra cada mes cuánto aportaste y qué intereses ganaste, y mira cómo crece tu plata.'},
@@ -214,6 +218,7 @@ const TS=[
 {mo:null,sel:'[data-a="mod"][data-p="pre"]',t:'Presupuesto 🧾',x:'Planea tus gastos fijos e ingresos, marca lo que vas pagando y mira cuánto te queda a fin de mes.'},
 {mo:null,sel:'[data-a="setg"]',t:'Ajustes ⚙️',x:'Cambia el color de la app y haz tu respaldo. Tus datos viven solo en tu teléfono, así que respalda de vez en cuando.'},
 {mo:null,sel:'[data-a="help"]',t:'Ayuda ❓',x:'Si olvidas algo, toca aquí para ver este recorrido de nuevo.'},
+{mo:'inv',tb:'reg',sel:nv('cfg'),t:'Inversiones: Configurar',x:'Aquí agregas, renombras o eliminas tus inversiones (por ejemplo, Cajita o Dafuturo). Empieza por aquí.'},
 {mo:'inv',tb:'reg',sel:nv('reg'),t:'Inversiones: Registrar',x:'Cada fin de mes escribe cuánto aportaste y cuántos intereses ganaste. El saldo se calcula solo.'},
 {mo:'inv',tb:'reg',sel:nv('res'),t:'Inversiones: Resumen',x:'Totales y rentabilidad. Filtra por periodo y toca una inversión para ver solo su detalle.'},
 {mo:'inv',tb:'reg',sel:nv('gra'),t:'Inversiones: Gráficas',x:'Evolución del saldo, capital vs rendimientos y cómo se reparte tu plata.'},
@@ -319,7 +324,7 @@ const s=o.scales;if(s){const ga=o.indexAxis=='y'?'x':'y';['x','y'].forEach(k=>{i
 return c}
 const mkc=(el,cfg)=>new Chart(el,sty(cfg));
 function hbar(id,labs,sets){return mkc($(id),{type:'bar',data:{labels:labs,datasets:sets},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:sets.length>1},tooltip:{callbacks:{label:c=>c.dataset.label+': $'+f(c.parsed.x)}}},scales:{x:{ticks:{callback:short}},y:{}}}})}
-const A={help:()=>{tOld=false;tour()},tskip:tend,tnext,tprev,neg:id=>{const el=$('#'+id);el.value=el.value.startsWith('-')?el.value.slice(1):'-'+el.value;upd()},pick:id=>{rinv=id;res();$('#v').scrollTop=0},pickall:()=>{rinv=null;res();$('#v').scrollTop=0},th:setTh,go:t=>{if(t=='res'){rinv=null;dbank=null;pcat=null}go(t)},pcat:n=>{pcat=n;pres();$('#v').scrollTop=0},pall:()=>{pcat=null;pres();$('#v').scrollTop=0},pxadd,pxdel,ixadd,ixdel,iadd,iidel,pcadd,pren:id=>{ped=id;pcfg()},pren2,pcdel,pidel,piadd,psug,dpick:e=>{dbank=e;dres();$('#v').scrollTop=0},dall:()=>{dbank=null;dres();$('#v').scrollTop=0},dsv,dadd,ddel,dren:id=>{ded=id;dreg()},dren2:id=>{const n=$('#den').value.trim();if(n)S.d.items.find(i=>i.id==id).name=n;save();ded='';dreg()},mod:k=>{mod=k;rinv=null;dbank=null;tab=k=='deu'&&!S.d.items.length?'reg':k=='pre'&&!S.p.items.length?'cfg':'res';render()},setg:()=>{mod='inv';tab='aju';render()},rall:()=>{rfil={from:null,to:null};res()},tg,sv,addI,bk,rs,ren,del,rsave};
+const A={help:()=>{tOld=false;tour()},tskip:tend,tnext,tprev,neg:id=>{const el=$('#'+id);el.value=el.value.startsWith('-')?el.value.slice(1):'-'+el.value;upd()},pick:id=>{rinv=id;res();$('#v').scrollTop=0},pickall:()=>{rinv=null;res();$('#v').scrollTop=0},th:setTh,go:t=>{if(t=='res'){rinv=null;dbank=null;pcat=null}go(t)},pcat:n=>{pcat=n;pres();$('#v').scrollTop=0},pall:()=>{pcat=null;pres();$('#v').scrollTop=0},pxadd,pxdel,ixadd,ixdel,iadd,iidel,pcadd,pren:id=>{ped=id;pcfg()},pren2,pcdel,pidel,piadd,psug,dpick:e=>{dbank=e;dres();$('#v').scrollTop=0},dall:()=>{dbank=null;dres();$('#v').scrollTop=0},dsv,dadd,ddel,dren:id=>{ded=id;dreg()},dren2:id=>{const n=$('#den').value.trim();if(n)S.d.items.find(i=>i.id==id).name=n;save();ded='';dreg()},mod:k=>{mod=k;rinv=null;dbank=null;tab=k=='deu'&&!S.d.items.length?'reg':k=='pre'&&!S.p.items.length?'cfg':'res';render()},setg:()=>{mod='ajs';tab='aju';render()},rall:()=>{rfil={from:null,to:null};res()},tg,sv,addI,bk,rs,ren,del,rsave};
 document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(t&&A[t.dataset.a])A[t.dataset.a](t.dataset.p)});
 document.addEventListener('change',e=>{const c=e.target.dataset.c;if(!c)return;const v=e.target.value;if(c=='from'){fil.from=v;gra()}else if(c=='to'){fil.to=v;gra()}else if(c=='rm'){rm=v||rm;reg()}else if(c=='ichk'){ichk(e.target)}else if(c=='pchk'){pchk(e.target)}else if(c=='pm'){pmo=v||pmo;pmes()}else if(c=='prs'){prm=v;pres()}else if(c=='pfrom'){const ms=Object.keys(S.p.e).sort();pfil.from=v==ms[0]?null:v;pgra()}else if(c=='pto'){const ms=Object.keys(S.p.e).sort();pfil.to=v==ms[ms.length-1]?null:v;pgra()}else if(c=='dfrom'){dfil.from=v==dcalc().L[0]?null:v;dgra()}else if(c=='dto'){const L=dcalc().L;dfil.to=v==L[L.length-1]?null:v;dgra()}else if(c=='ent'){$('#oeb').style.display=v=='Otra'?'block':'none'}else if(c=='drm'){drm=v||drm;dreg()}else if(c=='rfrom'){const L=mlist();rfil.from=v==L[0]?null:v;if(rfil.to&&rfil.to<v)rfil.to=v;res()}else if(c=='rto'){const L=mlist();rfil.to=v==L[L.length-1]?null:v;if(rfil.from&&rfil.from>v)rfil.from=v;res()}});
 document.addEventListener('input',e=>{if(e.target.dataset.i=='upd'){fmtEl(e.target,e);upd()}else if(e.target.dataset.i=='fmt')fmtEl(e.target,e);else if(e.target.dataset.i=='ireal'){fmtEl(e.target,e);ireal(e.target)}else if(e.target.dataset.i=='preal'){fmtEl(e.target,e);preal(e.target)}else if(e.target.dataset.i=='pmonto'){fmtEl(e.target,e);pmonto(e.target)}});
